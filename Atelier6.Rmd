@@ -1,0 +1,178 @@
+---
+title: Atelier 6 
+author: Isaure GARRIGUE
+date: 19/12/2019
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Étude cas témois sur l'infarctus du myocarde
+
+Les données suivantes sont issues d'une enquête cas témoins dont le but  était d'évaluer l'existence d'un risque plus élevé de survenue d'un infarctus du myocarde chez les femmes qui utilisent ou ont utilisé des contraceptifs oraux. L'étude a  été menée auprès de 149 femmes ayant eu un infarctus du myocarde (cas) et 300 femmes n'en n'ayant pas eu (témoins). Le facteur d’exposition principal est la prise de contraceptifs oraux, les autres facteurs recueillis sont : l'âge, le poids, la taille, la consommation de tabac, l'hypertension artérielle, les antécédents familiaux de maladies cardio-vasculaires.
+
+### Variables et codage
+
+\begin{tabular}{|l|p{5cm}|c|}
+\hline
+Description & Unite ou Codage & Variable \\
+\hline
+Infarctus du myocarde & 0 = Témoins; 1 = Cas & \texttt{INFARCT} \\
+\hline
+Prise de contraceptifs oraux & 0 = Jamais; 1 = Oui & \texttt{CO} \\
+\hline
+Consommation de tabac & 0 = Non;
+1 = Fumeuse actuelle; 2 = Ancienne fumeuse & \texttt{TABAC} \\
+\hline
+Âge & Années & \texttt{AGE} \\
+\hline
+Poids & kg & \texttt{POIDS} \\
+\hline
+Taille & cm  & \texttt{TAILLE} \\
+\hline 
+Antécédents familiaux de maladie cardio-vasculaire & 0 = Non ; 1 = Oui & \texttt{ATCD} \\
+\hline
+Hypertension artérielle  &  0 = Non ; 1 = Oui & \texttt{HTA} \\
+\hline
+\end{tabular}
+
+Vous avez de telecharcher le fichier \texttt{Infarct.csv} de le site:
+
+\url{https://github.com/afalco/Atelier6/}
+
+avec la fonction \texttt{read.csv2()}, à mon ordinateur:
+
+```{r}
+Infarct <- read.csv2("~/Documents/Infarct.csv")
+```
+
+et après de répondre a toutes les questions suivantes vous avez de télécharger le fichier \texttt{Atelier6.Rmd} rempli à votre répertoire dans \url{https://github.com/}. \textbf{La data limite pour le rentrer est le lundi 23 décembre 2019}:
+
+
+ 1. Etudier si la variable \texttt{TAILLE} suit une distribution normal
+ 
+```{r}
+z.TAILLE <- (Infarct$TAILLE-mean(Infarct$TAILLE))/sd(Infarct$TAILLE)
+set.seed(123)
+normal.simulation <- rnorm(length(z.TAILLE))
+qqplot(normal.simulation,z.TAILLE,xlim=c(-3,3),ylim=c(-3,3))
+par(new=T)
+plot(normal.simulation,normal.simulation,type="l",col="red",xlim=c(-3,3),ylim=c(-3,3), xlab = "",ylab = "")
+```
+
+Commentaire:
+
+ 2. Etudier si la variable \texttt{POIDS} suit une distribution normal.
+ 
+```{r}
+z.POIDS<- (Infarct$POIDS-mean(Infarct$POIDS))/sd(Infarct$POIDS)
+set.seed(123)
+normal.simulation <- rnorm(length(z.POIDS))
+qqplot(normal.simulation,z.POIDS,xlim=c(-3,3),ylim=c(-3,3))
+par(new=T)
+plot(normal.simulation,normal.simulation,type="l",col="red",xlim=c(-3,3),ylim=c(-3,3), xlab = "",ylab = "")
+```
+
+Commentaire:
+
+ 3. Calculer chez les femmes ayant eu un infarctus du myocarde le pourcentage de qui a prise des contraceptifs oraux et aussi chez le femmes n'en n'ayant pas eu un infarctus du myocarde le pourcentage de qui a prise de des contraceptifs oraux. 
+ 
+```{r}
+CO.INFARCTO <- Infarct$CO[Infarct$INFARCT==0]
+CO.INFARCT1 <- Infarct$CO[Infarct$INFARCT==1]
+probabilite.Infarct0 <- length(CO.INFARCTO)/length(Infarct$INFARCT)
+probabilite.Infarct1 <- length(CO.INFARCT1)/length(Infarct$INFARCT)
+table(CO.INFARCTO)
+prob.CO.INFARCTO <- table(CO.INFARCTO)/length(Infarct$CO)
+prob.CO.INFARCTO[2]
+table(CO.INFARCT1)
+prob.CO.INFARCT1<- table(CO.INFARCT1)/length(Infarct$CO)
+prob.CO.INFARCT1[2]
+```
+ 
+Commentaire:
+
+ 4. Calculer chez le femmes qui a prise des contraceptifs oraux quelle est la probabilité d'avoir un infarctus du myocarde.
+
+```{r}
+INFARCT.CO1<- Infarct$INFARCT[Infarct$CO==1]
+probabilite.Infarct1 <- length(INFARCT.CO1)/length(Infarct$CO)
+table(INFARCT.CO1)
+prob.INFARCT.CO1 <- table(INFARCT.CO1)/length(Infarct$INFARCT)
+prob.INFARCT.CO1[2]
+```
+ 
+ Commentaire:
+
+ 5. Représentez la fonction de densité de probabilité de la variable \texttt{AGE} chez l'échantillon. Est-ce qu'il est une variable discrète ou continue?
+ 
+```{r}
+hist(Infarct$AGE,freq = FALSE,xlab = "AGE",col="red")
+```
+ 
+ Commentaire: C'est une variable discrète.
+
+
+  6. Est-ce qu'il \texttt{IMC} de la base de données \texttt{Infarct} est bien calculé?
+ 
+    
+```{r}
+IMC1 <- Infarct$POIDS/(Infarct$TAILLE/100)^2
+Infarct <- data.frame(Infarct,IMC1)
+```
+ 
+Commentaire:
+
+ 
+ 7. Est-ce que la consommation du tabac est une facteur de risque chez le femmes ayant eu un infarctus du myocarde?
+ 
+
+```{r}
+TABACO.INFARCT <- length(Infarct$TABAC[Infarct$TABAC=="0" & Infarct$INFARCT=="1"])/length(Infarct$INFARCT[Infarct$INFARCT=="1"])
+TABACO.INFARCT
+TABAC1.INFARCT <- length(Infarct$TABAC[Infarct$TABAC=="1" & Infarct$INFARCT=="1"])/length(Infarct$INFARCT[Infarct$INFARCT=="1"])
+TABAC2.INFARCT <- length(Infarct$TABAC[Infarct$TABAC=="2" & Infarct$INFARCT=="1"])/length(Infarct$INFARCT[Infarct$INFARCT=="1"])
+Infarctus_tabac=TABAC2.INFARCT+TABAC1.INFARCT
+Infarctus_tabac
+```
+
+Commentaire: 
+
+
+  8. Quelle est la pourcentage chez le femmes avec antécédents familiaux de maladie cardio-vasculaire d'avoir un infarctus du myocarde?
+  
+```{r}
+INFARCT.ATCD1<- Infarct$INFARCT[Infarct$ATCD==1]
+probabilite.ATCD1 <- length(INFARCT.ATCD1)/length(Infarct$INFARCTUS)
+table(INFARCT.ATCD1)
+prob.INFARCT.ATCD1<- table(INFARCT.ATCD1)/length(Infarct$ATCD)
+prob.INFARCT.ATCD1[2]
+```
+
+  9. Est-ce le femmes ayant eu un infarctus du myocarde ont un poids moyenne différent de le femmes n'en n'ayant pas eu un infarctus du myocarde?
+  
+```{r}
+INFARCT.POIDS0<-Infarct$POIDS[Infarct$INFARCT==1]
+x<-mean(INFARCT.POIDS0)
+x
+INFARCT.POIDS1<-Infarct$POIDS[Infarct$INFARCT==0]
+y<-mean(INFARCT.POIDS1)
+y
+```
+  
+  Commentaire:
+  
+  10. Est-ce le femmes ayant eu un infarctus du myocarde ont une taille moyenne différent de le femmes n'en n'ayant pas eu un infarctus du myocarde?
+
+```{r}
+INFARCT.TAILLE0<-Infarct$TAILLE[Infarct$INFARCT==1]
+x<-mean(INFARCT.TAILLE0)
+x
+INFARCT.TAILLE1<-Infarct$TAILLE[Infarct$INFARCT==0]
+y<-mean(INFARCT.TAILLE1)
+y
+```
+
+  Commentaire:
